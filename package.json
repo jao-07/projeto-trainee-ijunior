@@ -4,7 +4,8 @@
   "description": "Projeto para o programa de trainee da ijunior 2025/1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node ./index.ts"
   },
   "repository": {
     "type": "git",
@@ -17,9 +18,14 @@
     "url": "https://github.com/jao-07/projeto-trainee-ijunior/issues"
   },
   "homepage": "https://github.com/jao-07/projeto-trainee-ijunior#readme",
-  "dependencies": {
+  "devDependencies": {
     "@types/node": "^24.1.0",
     "prisma": "^6.13.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "node": "^20.19.4"
   }
 }
