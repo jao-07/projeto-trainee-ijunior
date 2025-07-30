@@ -1,0 +1,25 @@
+{
+  "name": "projeto-trainee-ijunior",
+  "version": "1.0.0",
+  "description": "Projeto para o programa de trainee da ijunior 2025/1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jao-07/projeto-trainee-ijunior.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jao-07/projeto-trainee-ijunior/issues"
+  },
+  "homepage": "https://github.com/jao-07/projeto-trainee-ijunior#readme",
+  "dependencies": {
+    "@types/node": "^24.1.0",
+    "prisma": "^6.13.0",
+    "typescript": "^5.8.3"
+  }
+}
