@@ -18,6 +18,7 @@ model User {
   photo             String?
   password          String
   privileges        Boolean       @default(false)
+  musics            Music[]       @relation("UserMusic")
 }
 
 model Artist {
@@ -33,4 +34,5 @@ model Music {
   genre             String
   album             String
   artist_ID         Int
+  users             User[]       @relation("UserMusic")
 }
