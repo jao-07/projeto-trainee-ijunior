@@ -25,7 +25,8 @@ model Artist {
   id                Int           @id @default(autoincrement())
   name              String
   photo             String?
-  streams           Int
+  streams           Int 
+  musics            Music[]       @relation("MusicArtist")
 }
 
 model Music {
@@ -33,6 +34,6 @@ model Music {
   name              String
   genre             String
   album             String
-  artist_ID         Int
+  artists           Artist[]     @relation("MusicArtist")   
   users             User[]       @relation("UserMusic")
 }
