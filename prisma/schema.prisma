@@ -32,6 +32,7 @@ model Artist {
 model Music {
   id                Int           @id @default(autoincrement())
   name              String
+  duration          Int
   genre             String
   album             String
   artists           Artist[]     @relation("MusicArtist")   
