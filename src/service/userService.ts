@@ -37,10 +37,11 @@ export default class UserService {
 
     async addMusicToUser(musicID: number, userID: number){
         return await prisma.user.update({
-            data:{
-                musics:{ connect: {id: musicID} }
+            data: {
+                musics: { connect: { id: musicID } }
             },
-            where:{id: userID}
+            where: { id: userID },
+            include: { musics: true }
         })
     }
 
