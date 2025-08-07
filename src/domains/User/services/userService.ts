@@ -1,4 +1,4 @@
-import prisma from "../../config/prismaClient"
+import prisma from "../../../../config/prismaClient"
 import { User } from "@prisma/client"
 
 export default class UserService {
