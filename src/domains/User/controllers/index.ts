@@ -25,4 +25,17 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
+router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const data = req.body;
+		const user = await userService.update(Number(req.params.id), data);
+		res.json(user);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
+
+
 export default router;
