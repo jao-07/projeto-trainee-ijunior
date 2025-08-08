@@ -14,6 +14,16 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
+router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.getUserByID(Number(req.params.id));
+		res.json(user);
+	}
+	catch (error) {
+		next(error);
+	}
+});
+
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const data = req.body;
