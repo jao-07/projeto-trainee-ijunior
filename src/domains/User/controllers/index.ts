@@ -36,6 +36,16 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
+router.put("/:id/music/:musicID", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.addMusicToUser(Number(req.params.musicID), Number(req.params.id));
+		res.json(user);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
 router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByID(Number(req.params.id));
