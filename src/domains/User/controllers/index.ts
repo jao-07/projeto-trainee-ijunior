@@ -14,4 +14,15 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const data = req.body;
+		const user = await userService.create(data);
+		res.json(user);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
 export default router;
