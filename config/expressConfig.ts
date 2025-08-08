@@ -2,6 +2,7 @@ import { CorsOptions } from "cors";
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import UserRouter from "../src/domains/User/controllers/index"
 
 dotenv.config();
 
@@ -17,3 +18,4 @@ app.use(express.json());
 app.use(express.urlencoded({
 	extended: true
 }));
+app.use('/api/users', UserRouter)
