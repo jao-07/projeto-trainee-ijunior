@@ -143,7 +143,15 @@ router.put("/artist/:id/music/:musicID", async (req: Request, res: Response, nex
 	}
 });
 
-
+router.get("/artist/name/:name", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const artist = await artistService.getArtistByName(req.params.name);
+		res.json(artist);
+	}
+	catch (error) {
+		next(error);
+	}
+});
 
 
 
