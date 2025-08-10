@@ -133,6 +133,15 @@ router.delete("/artist/:id", async (req: Request, res: Response, next: NextFunct
 	}
 });
 
+router.put("/artist/:id/music/:musicID", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const artist = await artistService.addMusicToArtist(Number(req.params.musicID), Number(req.params.id));
+		res.json(artist);
+	}
+	catch (error) {
+		next(error);
+	}
+});
 
 
 
