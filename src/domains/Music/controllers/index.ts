@@ -40,4 +40,14 @@ router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction
 	}
 });
 
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const data = req.body;
+		const music = await musicService.create(data, data.artistIds);
+		res.json(music);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export default router;
