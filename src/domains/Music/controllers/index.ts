@@ -40,4 +40,33 @@ router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction
 	}
 });
 
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const data = req.body;
+		const music = await musicService.create(data, data.artistIds);
+		res.json(music);
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const data = req.body;
+		const music = await musicService.update(Number(req.params.id), data);
+		res.json(music);
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const music = await musicService.deleteMusic(Number(req.params.id));
+		res.json(music);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export default router;
