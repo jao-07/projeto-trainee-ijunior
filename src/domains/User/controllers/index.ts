@@ -123,6 +123,15 @@ router.put("/artist/:id", async (req: Request, res: Response, next: NextFunction
 	}
 });
 
+router.delete("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const artist = await artistService.deleteByID(Number(req.params.id));
+		res.json(artist);
+	}
+	catch (error){
+		next(error);
+	}
+});
 
 
 
