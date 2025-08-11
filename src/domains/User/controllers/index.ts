@@ -68,6 +68,24 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
 	}
 });
 
+router.get("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.getUserByEmail(req.params.email);
+		res.json(user);
+	}
+	catch (error) {
+		next(error);
+	}
+});
 
+router.delete("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.deleteByEmail(req.params.email);
+		res.json(user);
+	}
+	catch (error){
+		next(error);
+	}
+});
 
 export default router;
