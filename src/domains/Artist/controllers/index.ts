@@ -4,7 +4,7 @@ import ArtistService  from "../../Artist/services/artistService";
 const router = Router();
 const artistService = new ArtistService;
 
-router.get("/artist", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artists = await artistService.getArtists();
         res.json(artists);
@@ -14,7 +14,7 @@ router.get("/artist", async (req: Request, res: Response, next: NextFunction) =>
     }
 });
 
-router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.getArtistByID(Number(req.params.id));
         res.json(artist);
@@ -24,7 +24,7 @@ router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction
     }
 });
 
-router.post("/artist", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const data = req.body;
         const artist = await artistService.createArtist(data);
@@ -35,7 +35,7 @@ router.post("/artist", async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
-router.get("/artist/:name", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:name", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.getArtistByName(req.params.name);
         res.json(artist);
@@ -45,10 +45,10 @@ router.get("/artist/:name", async (req: Request, res: Response, next: NextFuncti
     }
 });
 
-router.put("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const data = req.body;
-        const artist = await artistService.updateArtist(Number(req.params.id), data);
+        const artist = await artistService.update(Number(req.params.id), data);
         res.json(artist);
     }
     catch (error){
@@ -56,7 +56,7 @@ router.put("/artist/:id", async (req: Request, res: Response, next: NextFunction
     }
 });
 
-router.delete("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.deleteByID(Number(req.params.id));
         res.json(artist);
@@ -66,7 +66,7 @@ router.delete("/artist/:id", async (req: Request, res: Response, next: NextFunct
     }
 });
 
-router.put("/artist/:id/music/:musicID", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/music/:musicID", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.addMusicToArtist(Number(req.params.musicID), Number(req.params.id));
         res.json(artist);
@@ -76,7 +76,7 @@ router.put("/artist/:id/music/:musicID", async (req: Request, res: Response, nex
     }
 });
 
-router.get("/artist/name/:name", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/name/:name", async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.getArtistByName(req.params.name);
         res.json(artist);

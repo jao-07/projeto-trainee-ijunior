@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import UserRouter from "../src/domains/User/controllers/index"
 import MusicRouter from "../src/domains/Music/controllers/index"
+import ArtistRouter from "../src/domains/Artist/controllers/index"
 
 dotenv.config();
 
@@ -21,3 +22,4 @@ app.use(express.urlencoded({
 }));
 app.use('/api/users', UserRouter)
 app.use('/api/musics', MusicRouter)
+app.use('/api/artists', ArtistRouter)
