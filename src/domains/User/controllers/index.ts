@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import UserService from "../services/userService";
-
-
+import login from "../../../middlewares/login";
 
 const router = Router();
 const userService = new UserService;
@@ -36,6 +35,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 		next(error);
 	}
 });
+
+router.post("/login", login)
 
 router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try{
