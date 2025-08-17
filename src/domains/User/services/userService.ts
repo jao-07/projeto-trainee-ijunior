@@ -1,15 +1,25 @@
 import prisma from "../../../../config/prismaClient";
 import { User } from "@prisma/client";
+import { QueryError } from "../../../../errors/QueryError";
+import encryptPassword from "../../../../utils/functions/encryptPassword";
 
 export default class UserService {
+
 	async create(userData: User){
+
+		if(await prisma.user.findUnique({ where: { email: userData.email } })) {
+            throw new QueryError('Email já cadastrado.');
+        }
+
+		userData.password = await encryptPassword(userData.password);
+
 		return await prisma.user.create({
 			data: {
 				name: userData.name,
 				email: userData.email,
 				photo: userData.photo,
 				password: userData.password,
-				privileges: userData.privileges
+				privileges: false
 			}
 		});
 	}
