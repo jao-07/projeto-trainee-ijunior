@@ -114,3 +114,15 @@ export function checkRole(requiredRoles: string[]) {
 		}
 	};
 }
+
+export function logout(req: Request, res: Response) {
+	try {
+		res.clearCookie("jwt").status(statusCodes.SUCCESS).json("Logout realizado com sucesso");
+	}
+	catch (error: any) {
+		res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+}
