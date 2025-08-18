@@ -44,7 +44,10 @@ export async function login (req: Request, res: Response, next: NextFunction){
         }).json("Login realizado com sucesso")
     }
     catch(error: any){
-        next(error)
+        res.status(statusCodes.UNAUTHORIZED).json({
+            error: error.name,
+            message: error.message
+        })
     }
 }
 
@@ -87,7 +90,10 @@ export function notLoggedIn(req: Request, res: Response, next: NextFunction){
             })
         }
     }
-    catch(error){
-        next(error)
+    catch(error: any){
+        res.status(statusCodes.UNAUTHORIZED).json({
+            error: error.name,
+            message: error.message
+        })
     }
 }
