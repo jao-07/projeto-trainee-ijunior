@@ -7,6 +7,7 @@ import statusCodes from "../../utils/constants/statusCodes";
 import { User } from "@prisma/client";
 import { PermissionError } from "../../errors/PermissionError";
 import { TokenError } from "../../errors/TokenError";
+import { LoginError } from "../../errors/LoginError";
 
 dotenv.config();
 
@@ -37,10 +38,10 @@ export async function login (req: Request, res: Response, next: NextFunction){
 
         const token = generateJWT(user)
         
-        res.status(statusCodes.NO_CONTENT).cookie("jwt", token, {
+        res.status(statusCodes.SUCCESS).cookie("jwt", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== "development"
-        })
+        }).json("Login realizado com sucesso")
     }
     catch(error: any){
         next(error)
@@ -70,6 +71,23 @@ export function verifyJWT(req: Request, res: Response, next: NextFunction) {
         next()
     }
     catch(error: any){
+        next(error)
+    }
+}
+
+export function notLoggedIn(req: Request, res: Response, next: NextFunction){
+    try{
+        const token = cookieExtractor(req)
+        if(token){
+            jwt.verify(token, process.env.SECRET_KEY || "", (err: any, decoded: any) => {
+                if(err)
+                    next()
+
+                throw new LoginError("Usuário já está logado")
+            })
+        }
+    }
+    catch(error){
         next(error)
     }
 }
