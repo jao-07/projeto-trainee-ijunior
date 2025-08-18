@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import UserService from "../services/userService";
-import login from "../../../middlewares/login";
+import {login} from "../../../middlewares/auth";
 
 const router = Router();
 const userService = new UserService;
