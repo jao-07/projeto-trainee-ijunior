@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import ArtistService  from "../../Artist/services/artistService";
+import { verifyJWT, checkRole } from "../../../middlewares/auth";
 
 const router = Router();
 const artistService = new ArtistService;
@@ -56,7 +57,7 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/artists/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
     try{
         const artist = await artistService.deleteByID(Number(req.params.id));
         res.json(artist);
