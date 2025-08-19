@@ -25,7 +25,7 @@ router.get("/:id", verifyJWT, checkRole(["admin", "user"]), async (req: Request,
 	}
 });
 
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/users/admin/create", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const data = req.body;
 		const user = await userService.create(data);
