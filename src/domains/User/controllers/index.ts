@@ -15,7 +15,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.get("/:id", verifyJWT, checkRole(["admin", "user"]), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/users/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.getUserByID(Number(req.params.id));
 		res.json(user);
