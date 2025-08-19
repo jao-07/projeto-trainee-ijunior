@@ -51,7 +51,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/musics/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = req.body;
 		const music = await musicService.update(Number(req.params.id), data);
@@ -61,7 +61,7 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.delete("/musics/delete/:id", verifyJWT, checkRole(["admin"]) async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/musics/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.deleteMusic(Number(req.params.id));
 		res.json(music);
