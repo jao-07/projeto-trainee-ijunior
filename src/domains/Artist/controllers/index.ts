@@ -46,7 +46,7 @@ router.get("/:name", async (req: Request, res: Response, next: NextFunction) => 
     }
 });
 
-router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/artists/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
     try{
         const data = req.body;
         const artist = await artistService.update(Number(req.params.id), data);
