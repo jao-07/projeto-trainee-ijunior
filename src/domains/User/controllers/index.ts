@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import UserService from "../services/userService";
-import {checkRole, login, notLoggedIn, verifyJWT} from "../../../middlewares/auth";
+import {login, notLoggedIn, verifyJWT, checkRole, logout} from "../../../middlewares/auth";
 
 const router = Router();
 const userService = new UserService;
@@ -15,7 +15,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", verifyJWT, checkRole(["admin", "user"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.getUserByID(Number(req.params.id));
 		res.json(user);
@@ -38,7 +38,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
 router.post("/login", notLoggedIn, login)
 
-router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/users/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const data = req.body;
 		const user = await userService.update(Number(req.params.id), data);
@@ -59,7 +59,7 @@ router.put("/:id/music/:musicID", async (req: Request, res: Response, next: Next
 	}
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/users/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByID(Number(req.params.id));
 		res.json(user);
@@ -79,7 +79,7 @@ router.get("/email/:email", async (req: Request, res: Response, next: NextFuncti
 	}
 });
 
-router.delete("/users/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByEmail(req.params.email);
 		res.json(user);
