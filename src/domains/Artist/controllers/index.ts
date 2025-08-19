@@ -25,7 +25,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/artists/create", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
     try{
         const data = req.body;
         const artist = await artistService.createArtist(data);
