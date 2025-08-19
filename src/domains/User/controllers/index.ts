@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import UserService from "../services/userService";
-import {login, notLoggedIn} from "../../../middlewares/auth";
+import {checkRole, login, notLoggedIn, verifyJWT} from "../../../middlewares/auth";
 
 const router = Router();
 const userService = new UserService;
@@ -79,7 +79,7 @@ router.get("/email/:email", async (req: Request, res: Response, next: NextFuncti
 	}
 });
 
-router.delete("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/users/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByEmail(req.params.email);
 		res.json(user);
