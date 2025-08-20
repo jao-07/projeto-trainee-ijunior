@@ -8,6 +8,7 @@ import { User } from "@prisma/client";
 import { PermissionError } from "../../errors/PermissionError";
 import { TokenError } from "../../errors/TokenError";
 import { LoginError } from "../../errors/LoginError";
+import userRoles from "../../utils/constants/userRoles";
 
 dotenv.config();
 
@@ -102,8 +103,16 @@ export function checkRole(requiredRoles: string[]) {
 	return (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const user = req.user;
-			if (!user || !requiredRoles.includes(user.privileges)) {
-				throw new PermissionError("Você não tem permissão para acessar este recurso");
+			if (!user || !user.privileges) {
+				throw new PermissionError("Usuário não autenticado ou sem privilégios");
+			}
+			
+			const userPrivileges = Array.isArray(user.privileges) ? user.privileges : [user.privileges];
+
+			const hasPermission = requiredRoles.some(role => userPrivileges.includes(role));
+
+			if (!hasPermission) {
+				throw new PermissionError("Usuário não tem permissão para realizar essa ação");
 			}
 			next();
 		} catch (error: any) {
