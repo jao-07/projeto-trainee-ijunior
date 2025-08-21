@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import prisma from "../../config/prismaClient"
+import prisma from "../../config/prismaClient";
 import comparePassword from "../../utils/functions/comparePassword";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -18,84 +18,84 @@ function generateJWT(user: User): string{
 		name: user.name,
 		id: user.id,
 		privileges: user.privileges
-	}
+	};
 
-	return jwt.sign(payload, process.env.SECRET_KEY as string, {expiresIn: Number(process.env.JWT_EXPIRATION)})
+	return jwt.sign(payload, process.env.SECRET_KEY as string, {expiresIn: Number(process.env.JWT_EXPIRATION)});
 }
 
 export async function login (req: Request, res: Response, next: NextFunction){
 	try{
 		const {email, password} = req.body;
-		const user = await prisma.user.findUnique({ where: { email: email}})
+		const user = await prisma.user.findUnique({ where: { email: email}});
 
 		if(!user){
-			throw new PermissionError('Email e/ou senha incorretos')
+			throw new PermissionError("Email e/ou senha incorretos");
 		}
 
 		const passwordsMatch = await comparePassword(password, user.password);
 		if(!passwordsMatch){
-			throw new PermissionError('Email e/ou senha incorretos')
+			throw new PermissionError("Email e/ou senha incorretos");
 		}
 
-		const token = generateJWT(user)
+		const token = generateJWT(user);
         
 		res.status(statusCodes.SUCCESS).cookie("jwt", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV !== "development"
-		}).json("Login realizado com sucesso")
+		}).json("Login realizado com sucesso");
 	}
 	catch(error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
 			error: error.name,
 			message: error.message
-		})
+		});
 	}
 }
 
 function cookieExtractor(req: Request){
-	let token = null
+	let token = null;
 	if(req.cookies){
-		token = req.cookies["jwt"]
+		token = req.cookies["jwt"];
 	}
-	return token
+	return token;
 }
 
 export function verifyJWT(req: Request, res: Response, next: NextFunction) {
 	try{
-		const token = cookieExtractor(req)
+		const token = cookieExtractor(req);
 
 		if(token){
-			const decoded = jwt.verify(token, process.env.SECRET_KEY || "") as JwtPayload
-			req.user = decoded.user
+			const decoded = jwt.verify(token, process.env.SECRET_KEY || "") as JwtPayload;
+			req.user = decoded.user;
 		}
 
 		if(req.user == null)
-			throw new TokenError("Você precisa estar logado para realizar essa ação")
+			throw new TokenError("Você precisa estar logado para realizar essa ação");
 
-		next()
+		next();
 	}
 	catch(error: any){
-		next(error)
+		next(error);
 	}
 }
 
 export function notLoggedIn(req: Request, res: Response, next: NextFunction){
 	try{
-		const token = cookieExtractor(req)
+		const token = cookieExtractor(req);
 		if(token){
 			jwt.verify(token, process.env.SECRET_KEY || "", (err: any, decoded: any) => {
 				if(err)
-					next()
+					next();
 
-				throw new LoginError("Usuário já está logado")
-			})
+				throw new LoginError("Usuário já está logado");
+			});
 		}
 	}
 	catch(error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
 			error: error.name,
 			message: error.message
-		})
+		});
 	}
 }
 

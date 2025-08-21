@@ -36,7 +36,9 @@ router.post("/users/admin/create", verifyJWT, checkRole(["admin"]), async (req: 
 	}
 });
 
-router.post("/login", notLoggedIn, login)
+router.post("/login", notLoggedIn, login);
+
+router.post("logout", verifyJWT, logout);
 
 router.put("/users/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try{
