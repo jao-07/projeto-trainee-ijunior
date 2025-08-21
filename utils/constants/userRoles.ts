@@ -1,4 +1,4 @@
-export userRoles = {
-    ADMIN: 'admin',
-    USER: 'user'
+export const userRoles = {
+	ADMIN: "ADMIN",
+	USER: "USER"
 };

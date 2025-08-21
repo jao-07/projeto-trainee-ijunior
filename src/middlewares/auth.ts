@@ -8,7 +8,7 @@ import { User } from "@prisma/client";
 import { PermissionError } from "../../errors/PermissionError";
 import { TokenError } from "../../errors/TokenError";
 import { LoginError } from "../../errors/LoginError";
-import userRoles from "../../utils/constants/userRoles";
+import {userRoles} from "../../utils/constants/userRoles";
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ function generateJWT(user: User): string{
 	return jwt.sign(payload, process.env.SECRET_KEY as string, {expiresIn: Number(process.env.JWT_EXPIRATION)});
 }
 
-export async function login (req: Request, res: Response, next: NextFunction){
+export async function login (req: Request, res: Response){
 	try{
 		const {email, password} = req.body;
 		const user = await prisma.user.findUnique({ where: { email: email}});
@@ -99,27 +99,22 @@ export function notLoggedIn(req: Request, res: Response, next: NextFunction){
 	}
 }
 
-export function checkRole(requiredRoles: string[]) {
+export function checkRole(requiredRoles: string) {
 	return (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const user = req.user;
 			if (!user || !user.privileges) {
 				throw new PermissionError("Usuário não autenticado ou sem privilégios");
 			}
-			
-			const userPrivileges = Array.isArray(user.privileges) ? user.privileges : [user.privileges];
 
-			const hasPermission = requiredRoles.some(role => userPrivileges.includes(role));
+			const hasPermission = requiredRoles === user.privileges;
 
 			if (!hasPermission) {
 				throw new PermissionError("Usuário não tem permissão para realizar essa ação");
 			}
 			next();
 		} catch (error: any) {
-			res.status(statusCodes.FORBIDDEN).json({
-				error: error.name,
-				message: error.message
-			});
+			next();
 		}
 	};
 }

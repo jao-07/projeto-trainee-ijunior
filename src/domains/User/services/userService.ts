@@ -2,14 +2,15 @@ import prisma from "../../../../config/prismaClient";
 import { User } from "@prisma/client";
 import { QueryError } from "../../../../errors/QueryError";
 import encryptPassword from "../../../../utils/functions/encryptPassword";
+import { userRoles } from "../../../../utils/constants/userRoles";
 
 export default class UserService {
 
 	async create(userData: User){
 
 		if(await prisma.user.findUnique({ where: { email: userData.email } })) {
-            throw new QueryError('Email já cadastrado.');
-        }
+			throw new QueryError("Email já cadastrado.");
+		}
 
 		userData.password = await encryptPassword(userData.password);
 
@@ -19,7 +20,7 @@ export default class UserService {
 				email: userData.email,
 				photo: userData.photo,
 				password: userData.password,
-				privileges: false
+				privileges: userRoles.USER
 			}
 		});
 	}
