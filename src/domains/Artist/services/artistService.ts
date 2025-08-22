@@ -13,7 +13,7 @@ export default class ArtistService {
 	}
     
 	async getArtists() {
-		return await prisma.artist.findMany();
+		return await prisma.artist.findMany({orderBy: {name: "asc"}});
 	}
 
 	async getArtistByID(artistID: number){
