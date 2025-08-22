@@ -48,7 +48,7 @@ router.get("/account", verifyJWT, async (req: Request, res: Response) => {
 });
 
 //Editar minha conta
-router.put("/account/update", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.put("/account/update", verifyJWT, async (req: Request, res: Response) => {
 	try{
 		const data = req.body;
 		if(!data)

@@ -3,6 +3,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import ArtistService  from "../../Artist/services/artistService";
 import { verifyJWT, checkRole } from "../../../middlewares/auth";
 import statusCodes from "../../../../utils/constants/statusCodes";
+import { InvalidParamError } from "../../../../errors/InvalidParamError";
 
 const router = Router();
 const artistService = new ArtistService;
@@ -21,49 +22,38 @@ router.get("/", verifyJWT, async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Visualizar artista específico
+router.get("/:id", verifyJWT, async (req: Request, res: Response) => {
 	try{
 		const artist = await artistService.getArtistByID(Number(req.params.id));
-		res.json(artist);
+		res.json(artist).status(statusCodes.SUCCESS);
 	}
-	catch (error) {
-		next(error);
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.post("/artists/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
+//Criar artista
+router.post("/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
 	try{
 		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Campos do usuário vazios");
 		const artist = await artistService.createArtist(data);
-		res.json(artist);
+		res.json(artist).status(statusCodes.SUCCESS);
 	}
-	catch (error){
-		next(error);
-	}
-});
-
-router.get("/:name", async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const artist = await artistService.getArtistByName(req.params.name);
-		res.json(artist);
-	}
-	catch (error) {
-		next(error);
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.put("/artists/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const data = req.body;
-		const artist = await artistService.update(Number(req.params.id), data);
-		res.json(artist);
-	}
-	catch (error){
-		next(error);
-	}
-});
-
-router.delete("/artists/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/artists/delete/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.deleteByID(Number(req.params.id));
 		res.json(artist);
