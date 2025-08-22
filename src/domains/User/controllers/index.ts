@@ -91,6 +91,20 @@ router.put("/account/password", verifyJWT, async (req: Request, res: Response) =
 	}
 });
 
+//Excluir minha conta
+router.delete("/account/delete", verifyJWT, async (req: Request, res: Response) => {
+	try{
+		const user = req.user;
+		const deletedUser = await userService.deleteByID(user.id as number);
+		res.json(deletedUser).status(statusCodes.SUCCESS).clearCookie("jwt");
+	}
+	catch(error: any){
+		res.status(statusCodes.FORBIDDEN).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
