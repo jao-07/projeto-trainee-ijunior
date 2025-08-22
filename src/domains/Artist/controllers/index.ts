@@ -53,6 +53,24 @@ router.post("/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: 
 	}
 });
 
+//Editar artista
+router.put("/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
+		const artist = await artistService.update(Number(req.params.id), data);
+		res.json(artist).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
 router.delete("/artists/delete/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.deleteByID(Number(req.params.id));
