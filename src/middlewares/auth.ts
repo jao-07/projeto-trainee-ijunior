@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../config/prismaClient";
 import comparePassword from "../../utils/functions/comparePassword";
@@ -8,7 +9,6 @@ import { User } from "@prisma/client";
 import { PermissionError } from "../../errors/PermissionError";
 import { TokenError } from "../../errors/TokenError";
 import { LoginError } from "../../errors/LoginError";
-import {userRoles} from "../../utils/constants/userRoles";
 
 dotenv.config();
 
@@ -88,7 +88,7 @@ export function notLoggedIn(req: Request, res: Response, next: NextFunction){
 	try{
 		const token = cookieExtractor(req);
 		if(token){
-			jwt.verify(token, process.env.SECRET_KEY || "", (err: any, decoded: any) => {
+			jwt.verify(token, process.env.SECRET_KEY || "", (err: any) => {
 				if(err)
 					next();
 
@@ -120,7 +120,7 @@ export function checkRole(requiredRoles: string) {
 			}
 			next();
 		} catch (error: any) {
-			next();
+			next(error);
 		}
 	};
 }

@@ -65,8 +65,29 @@ router.put("/account/update", verifyJWT, async (req: Request, res: Response, nex
 		const updatedUser = await userService.update(user.id as number, updateData);
 		res.json(updatedUser).status(statusCodes.SUCCESS);
 	}
-	catch (error){
-		next(error);
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Alterar minha senha
+router.put("/account/password", verifyJWT, async (req: Request, res: Response) => {
+	try{
+		const user = req.user;
+		const password = req.body.password;
+		if(!password)
+			throw new InvalidParamError("Senha inválida");
+		const updatedUser = await userService.update(user.id as number, {password: password});
+		res.json(updatedUser).status(statusCodes.SUCCESS);
+	}
+	catch(error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
