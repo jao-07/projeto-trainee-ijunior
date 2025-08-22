@@ -1,9 +1,75 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router, Request, Response, NextFunction } from "express";
 import UserService from "../services/userService";
 import {login, notLoggedIn, verifyJWT, checkRole, logout} from "../../../middlewares/auth";
+import { InvalidParamError } from "../../../../errors/InvalidParamError";
+import { User } from "@prisma/client";
+import statusCodes from "../../../../utils/constants/statusCodes";
 
 const router = Router();
 const userService = new UserService;
+
+//Criar conta (usuário normal)
+router.post("/create", async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Campos do usuário vazios");
+		const user = await userService.create(data);
+		res.json(user).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Login
+router.post("/login", notLoggedIn, login);
+
+//Logout
+router.post("/logout", verifyJWT, logout);
+
+//Visualizar minha conta
+router.get("/account", verifyJWT, async (req: Request, res: Response) => {
+	try{
+		const user = req.user;
+		const userData = await userService.getUserByID(user.id as number);
+		res.json(userData).status(statusCodes.SUCCESS);
+	}
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Editar minha conta
+router.put("/account/update", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
+		const user = req.user;
+		const updateData: Partial<User> = {
+			name: data.name !== undefined ? data.name : user.name,
+			email: data.email !== undefined ? data.email : user.email,
+			photo: data.photo !== undefined ? data.photo : user.photo,
+			password: data.password !== undefined ? data.password : user.password,
+		};
+
+		const updatedUser = await userService.update(user.id as number, updateData);
+		res.json(updatedUser).status(statusCodes.SUCCESS);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
@@ -15,7 +81,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.get("/users/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.getUserByID(Number(req.params.id));
 		res.json(user);
@@ -25,22 +91,9 @@ router.get("/users/:id", verifyJWT, checkRole("admin"), async (req: Request, res
 	}
 });
 
-router.post("/users/admin/create", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const data = req.body;
-		const user = await userService.create(data);
-		res.json(user);
-	}
-	catch (error){
-		next(error);
-	}
-});
 
-router.post("/login", notLoggedIn, login);
 
-router.post("logout", verifyJWT, logout);
-
-router.put("/users/update/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/update/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const data = req.body;
 		const user = await userService.update(Number(req.params.id), data);
@@ -61,7 +114,7 @@ router.put("/:id/music/:musicID", async (req: Request, res: Response, next: Next
 	}
 });
 
-router.delete("/users/delete/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/delete/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByID(Number(req.params.id));
 		res.json(user);

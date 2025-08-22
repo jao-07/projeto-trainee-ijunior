@@ -38,6 +38,9 @@ export default class UserService {
 	}
 
 	async update(userID: number, userData: Partial<User>){
+		if(userData.password)
+			userData.password = await encryptPassword(userData.password as string);
+	
 		return await prisma.user.update({
 			data: userData,
 			where: {

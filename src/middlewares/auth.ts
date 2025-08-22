@@ -66,7 +66,12 @@ export function verifyJWT(req: Request, res: Response, next: NextFunction) {
 
 		if(token){
 			const decoded = jwt.verify(token, process.env.SECRET_KEY || "") as JwtPayload;
-			req.user = decoded.user;
+			req.user = {
+				email: decoded.email,
+				name: decoded.name,
+				id: decoded.id,
+				privileges: decoded.privileges
+			};
 		}
 
 		if(req.user == null)
@@ -90,6 +95,7 @@ export function notLoggedIn(req: Request, res: Response, next: NextFunction){
 				throw new LoginError("Usuário já está logado");
 			});
 		}
+		next();
 	}
 	catch(error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
