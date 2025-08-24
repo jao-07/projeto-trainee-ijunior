@@ -6,12 +6,15 @@ import statusCodes from "../../../../utils/constants/statusCodes";
 const router = Router();
 const musicService = new MusicService;
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const musics = await musicService.getMusics();
-		res.json(musics);
+		res.json(musics).status(statusCodes.SUCCESS);
 	} catch (error) {
-		next(error);
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
