@@ -56,13 +56,18 @@ router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) =
 
 
 //criar música
-router.post("/musics/create", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/musics/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
 	try {
 		const data = req.body;
+		if(!data)
+			throw new Error("Campos da música vazios");
 		const music = await musicService.create(data, data.artistIds);
-		res.json(music);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(music);
+	} catch (error:any) {
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
