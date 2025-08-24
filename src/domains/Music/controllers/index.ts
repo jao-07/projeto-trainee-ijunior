@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import MusicService from '../services/musicService';
-import { verifyJWT, checkRole } from '../../../middlewares/auth';
+import {login, notLoggedIn, verifyJWT, checkRole, logout} from "../../../middlewares/auth";
 import statusCodes from "../../../../utils/constants/statusCodes";
+import { InvalidParamError } from "../../../../errors/InvalidParamError";
 
 const router = Router();
 const musicService = new MusicService;
@@ -72,13 +73,27 @@ router.post("/musics/create", verifyJWT, checkRole("ADMIN"), async (req: Request
 });
 
 //Editar música
-router.put("/musics/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/musics/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = req.body;
-		const music = await musicService.update(Number(req.params.id), data);
-		res.json(music);
-	} catch (error) {
-		next(error);
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
+		const music = req.music;
+		const updatedData: Partial<Music> = {
+			name: data.name !== undefined ? data.name : music.name,
+			duration: data.duration !== undefined ? data.duration : music.duration,
+			genre: data.genre !== undefined ? data.genre : music.genre,
+			album: data.album !== undefined ? data.album : music.album,
+		};
+		const updatesMusic = await musicService.update(Number(req.params.id), updatedData);
+		res.status(statusCodes.SUCCESS).json(updatesMusic);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
