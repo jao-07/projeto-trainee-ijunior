@@ -9,7 +9,7 @@ const musicService = new MusicService;
 router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const musics = await musicService.getMusics();
-		res.json(musics).status(statusCodes.SUCCESS);
+		res.status(statusCodes.SUCCESS).json(musics);
 	} catch (error) {
 		res.status(statusCodes.UNAUTHORIZED).json({
 			error: error.name,
@@ -18,12 +18,17 @@ router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextF
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//achar música por id
+router.get("/musics/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.getMusicById(Number(req.params.id));
-		res.json(music);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(music);
+	} 
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message:error.message
+		});
 	}
 });
 
@@ -39,7 +44,7 @@ router.get("/music/:name", async (req: Request, res: Response, next: NextFunctio
 router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) => {
 	try{
 		const musics = await musicService.getMusicsByArtist(Number(req.params.id));
-		res.json(musics).status(statusCodes.SUCCESS);
+		res.status(statusCodes.SUCCESS).json(musics);
 	}
 	catch (error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
