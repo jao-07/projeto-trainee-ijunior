@@ -91,7 +91,7 @@ router.put("/musics/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Requ
 });
 
 //Deletar música
-router.delete("/musics/delete/:id", verifyJWT, checkRole("admin"), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/musics/delete/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.deleteMusic(Number(req.params.id));
 		res.json(music);
