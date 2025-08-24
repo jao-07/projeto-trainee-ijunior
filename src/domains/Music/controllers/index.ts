@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import MusicService from '../services/musicService';
 import { verifyJWT, checkRole } from '../../../middlewares/auth';
+import statusCodes from "../../../../utils/constants/statusCodes";
 
 const router = Router();
 const musicService = new MusicService;
@@ -31,16 +32,22 @@ router.get("/music/:name", async (req: Request, res: Response, next: NextFunctio
 		next(error);
 	}
 });
-
-router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
-	try {
+//listar musicas de um artista
+router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) => {
+	try{
 		const musics = await musicService.getMusicsByArtist(Number(req.params.id));
-		res.json(musics);
-	} catch (error) {
-		next(error);
+		res.json(musics).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
+
+//criar música
 router.post("/musics/create", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = req.body;
@@ -51,6 +58,7 @@ router.post("/musics/create", verifyJWT, checkRole(["admin"]), async (req: Reque
 	}
 });
 
+//Editar música
 router.put("/musics/update/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = req.body;
@@ -61,6 +69,7 @@ router.put("/musics/update/:id", verifyJWT, checkRole(["admin"]), async (req: Re
 	}
 });
 
+//Deletar música
 router.delete("/musics/delete/:id", verifyJWT, checkRole(["admin"]), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.deleteMusic(Number(req.params.id));
@@ -69,5 +78,7 @@ router.delete("/musics/delete/:id", verifyJWT, checkRole(["admin"]), async (req:
 		next(error);
 	}
 });
+
+
 
 export default router;
