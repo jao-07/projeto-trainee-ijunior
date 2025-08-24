@@ -20,7 +20,7 @@ router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextF
 });
 
 //achar música por id
-router.get("/musics/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/musics/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.getMusicById(Number(req.params.id));
 		res.status(statusCodes.SUCCESS).json(music);
@@ -57,7 +57,7 @@ router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) =
 
 
 //criar música
-router.post("/musics/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
+router.post("/musics/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try {
 		const data = req.body;
 		if(!data)
@@ -73,7 +73,7 @@ router.post("/musics/create", verifyJWT, checkRole("ADMIN"), async (req: Request
 });
 
 //Editar música
-router.put("/musics/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/musics/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = req.body;
 		if(!data)
@@ -91,7 +91,7 @@ router.put("/musics/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Requ
 });
 
 //Deletar música
-router.delete("/musics/delete/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/musics/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.deleteMusic(Number(req.params.id));
 		res.json(music);

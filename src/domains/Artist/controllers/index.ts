@@ -37,7 +37,7 @@ router.get("/:id", verifyJWT, async (req: Request, res: Response) => {
 });
 
 //Criar artista
-router.post("/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
+router.post("/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try{
 		const data = req.body;
 		if(!data)
@@ -54,7 +54,7 @@ router.post("/create", verifyJWT, checkRole("ADMIN"), async (req: Request, res: 
 });
 
 //Editar artista
-router.put("/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response) => {
+router.put("/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try{
 		const data = req.body;
 		if(!data)
@@ -71,7 +71,7 @@ router.put("/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, re
 	}
 });
 
-router.delete("/artists/delete/:id", verifyJWT, checkRole("ADMIN"), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/artists/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.deleteByID(Number(req.params.id));
 		res.json(artist);
