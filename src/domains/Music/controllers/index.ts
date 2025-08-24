@@ -79,15 +79,8 @@ router.put("/musics/update/:id", verifyJWT, checkRole("ADMIN"), async (req: Requ
 		if(!data)
 			throw new InvalidParamError("Parâmetros de update vazios");
 
-		const music = req.music;
-		const updatedData: Partial<Music> = {
-			name: data.name !== undefined ? data.name : music.name,
-			duration: data.duration !== undefined ? data.duration : music.duration,
-			genre: data.genre !== undefined ? data.genre : music.genre,
-			album: data.album !== undefined ? data.album : music.album,
-		};
-		const updatesMusic = await musicService.update(Number(req.params.id), updatedData);
-		res.status(statusCodes.SUCCESS).json(updatesMusic);
+		const music = await musicService.update(Number(req.params.id), data);
+		res.status(statusCodes.SUCCESS).json(music);
 	}
 	catch (error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
