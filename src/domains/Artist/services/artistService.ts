@@ -33,12 +33,14 @@ export default class ArtistService {
 		});
 	}
     
+	// Faz com que apareça os dados da música na resposta
 	async addMusicToArtist(musicID: number, artistID: number){
 		return await prisma.artist.update({
-			data:{
-				musics:{ connect: {id: musicID} }
+			where: { id: artistID },
+			data: {
+				musics: { connect: { id: musicID } }
 			},
-			where:{id: artistID}        
+			include: { musics: true }
 		});
 	}
 
