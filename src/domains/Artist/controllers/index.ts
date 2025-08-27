@@ -4,6 +4,7 @@ import ArtistService  from "../../Artist/services/artistService";
 import { verifyJWT, checkRole } from "../../../middlewares/auth";
 import statusCodes from "../../../../utils/constants/statusCodes";
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
+import { userRoles } from "../../../../utils/constants/userRoles";
 
 const router = Router();
 const artistService = new ArtistService;
@@ -12,7 +13,7 @@ const artistService = new ArtistService;
 router.get("/", verifyJWT, async (req: Request, res: Response) => {
 	try{
 		const artists = await artistService.getArtists();
-		res.json(artists).status(statusCodes.SUCCESS);
+		res.status(statusCodes.SUCCESS).json(artists);
 	}
 	catch (error: any) {
 		res.status(statusCodes.UNAUTHORIZED).json({
@@ -26,7 +27,7 @@ router.get("/", verifyJWT, async (req: Request, res: Response) => {
 router.get("/:id", verifyJWT, async (req: Request, res: Response) => {
 	try{
 		const artist = await artistService.getArtistByID(Number(req.params.id));
-		res.json(artist).status(statusCodes.SUCCESS);
+		res.status(statusCodes.SUCCESS).json(artist);
 	}
 	catch (error: any) {
 		res.status(statusCodes.UNAUTHORIZED).json({
@@ -43,7 +44,7 @@ router.post("/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Reques
 		if(!data)
 			throw new InvalidParamError("Campos do usuário vazios");
 		const artist = await artistService.createArtist(data);
-		res.json(artist).status(statusCodes.SUCCESS);
+		res.status(statusCodes.CREATED).json(artist);
 	}
 	catch (error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
@@ -61,7 +62,7 @@ router.put("/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Req
 			throw new InvalidParamError("Parâmetros de update vazios");
 
 		const artist = await artistService.update(Number(req.params.id), data);
-		res.json(artist).status(statusCodes.SUCCESS);
+		res.status(statusCodes.SUCCESS).json(artist);
 	}
 	catch (error: any){
 		res.status(statusCodes.UNAUTHORIZED).json({
@@ -71,36 +72,46 @@ router.put("/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Req
 	}
 });
 
-router.delete("/artists/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
+//Deletar artista
+router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.deleteByID(Number(req.params.id));
-		res.json(artist);
+		res.status(statusCodes.NO_CONTENT).json(artist);
 	}
-	catch (error){
-		next(error);
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.put("/:id/music/:musicID", async (req: Request, res: Response, next: NextFunction) => {
+//Adicionar música a um artista
+router.put("/:id/music/:musicID", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.addMusicToArtist(Number(req.params.musicID), Number(req.params.id));
-		res.json(artist);
+		res.status(statusCodes.SUCCESS).json(artist);
 	}
-	catch (error) {
-		next(error);
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.get("/name/:name", async (req: Request, res: Response, next: NextFunction) => {
+// Busca um artista pelo nome
+router.get("/name/:name", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await artistService.getArtistByName(req.params.name);
-		res.json(artist);
+		res.status(statusCodes.SUCCESS).json(artist);
 	}
-	catch (error) {
-		next(error);
+	catch (error: any) {
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
-
-
 
 export default router;
