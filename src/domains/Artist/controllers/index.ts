@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Request, Response } from "express";
 import ArtistService  from "../../Artist/services/artistService";
 import { verifyJWT, checkRole } from "../../../middlewares/auth";
 import statusCodes from "../../../../utils/constants/statusCodes";
@@ -73,7 +73,7 @@ router.put("/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Req
 });
 
 //Deletar artista
-router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try{
 		const artist = await artistService.deleteByID(Number(req.params.id));
 		res.status(statusCodes.NO_CONTENT).json(artist);
@@ -87,7 +87,7 @@ router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: 
 });
 
 //Adicionar música a um artista
-router.put("/:id/music/:musicID", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id/music/:musicID", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try{
 		const artist = await artistService.addMusicToArtist(Number(req.params.musicID), Number(req.params.id));
 		res.status(statusCodes.SUCCESS).json(artist);
@@ -101,7 +101,7 @@ router.put("/:id/music/:musicID", verifyJWT, checkRole(userRoles.ADMIN), async (
 });
 
 // Busca um artista pelo nome
-router.get("/name/:name", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/name/:name", verifyJWT, async (req: Request, res: Response) => {
 	try{
 		const artist = await artistService.getArtistByName(req.params.name);
 		res.status(statusCodes.SUCCESS).json(artist);

@@ -1,17 +1,19 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import MusicService from '../services/musicService';
-import {login, notLoggedIn, verifyJWT, checkRole, logout} from "../../../middlewares/auth";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Router, Request, Response, NextFunction } from "express";
+import MusicService from "../services/musicService";
+import {verifyJWT, checkRole} from "../../../middlewares/auth";
 import statusCodes from "../../../../utils/constants/statusCodes";
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
+import { userRoles } from "../../../../utils/constants/userRoles";
 
 const router = Router();
 const musicService = new MusicService;
 
-router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/musics", verifyJWT, async (req: Request, res: Response) => {
 	try {
 		const musics = await musicService.getMusics();
 		res.status(statusCodes.SUCCESS).json(musics);
-	} catch (error) {
+	} catch (error: any) {
 		res.status(statusCodes.UNAUTHORIZED).json({
 			error: error.name,
 			message: error.message
@@ -20,7 +22,7 @@ router.get("/musics", verifyJWT, async (req: Request, res: Response, next: NextF
 });
 
 //achar música por id
-router.get("/musics/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/musics/:id", verifyJWT, async (req: Request, res: Response) => {
 	try {
 		const music = await musicService.getMusicById(Number(req.params.id));
 		res.status(statusCodes.SUCCESS).json(music);
@@ -73,7 +75,7 @@ router.post("/musics/create", verifyJWT, checkRole(userRoles.ADMIN), async (req:
 });
 
 //Editar música
-router.put("/musics/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/musics/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try {
 		const data = req.body;
 		if(!data)

@@ -5,6 +5,7 @@ import {login, notLoggedIn, verifyJWT, checkRole, logout} from "../../../middlew
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
 import { User } from "@prisma/client";
 import statusCodes from "../../../../utils/constants/statusCodes";
+import { userRoles } from "../../../../utils/constants/userRoles";
 
 const router = Router();
 const userService = new UserService;
