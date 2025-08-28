@@ -4,9 +4,9 @@
   "description": "Projeto para o programa de trainee da ijunior 2025/1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsnd --rs --respawn --transpile-only --exit-child index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest --verbose"
   },
   "repository": {
     "type": "git",
@@ -25,13 +25,17 @@
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^8.57.1",
     "globals": "^16.3.0",
+    "jest": "^30.1.1",
+    "jest-mock-extended": "^4.0.0",
     "jiti": "^2.5.1",
     "prisma": "^6.13.0",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0"
