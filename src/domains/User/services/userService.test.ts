@@ -156,4 +156,28 @@ describe("userService", () => {
 			});
 		});
 	});
+
+	describe("deleteByID", () => {
+		test("deve deletar um usuário que está cadastrado", async () => {
+			prismaMock.user.delete.mockResolvedValue(userData2);
+			const user = await userService.deleteByID(2);
+			expect(user).toEqual(userData2);
+			expect(prismaMock.user.delete).toHaveBeenCalledWith({
+				where: {id: userData2.id}
+			});
+		});
+
+		test("deve lançar erro ao tentar deletar um usuário que não está cadastrado", async () => {
+			prismaMock.user.delete.mockRejectedValue({
+				code: "P2025",
+				message: "Registro não encontrado",
+			});
+			await expect(userService.deleteByID(999)).rejects.toMatchObject({
+				code: "P2025",
+			});
+			expect(prismaMock.user.delete).toHaveBeenCalledWith({
+				where: { id: 999 },
+			});
+		});
+	});
 });
