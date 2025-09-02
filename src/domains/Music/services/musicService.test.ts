@@ -62,6 +62,49 @@ describe("musicService", () => {
         });
     });
 
+    describe("update", () => {
+        test("deve atualizar os dados da música do ID passado, com as informações passadas", async () => {
+            const dataPassed = {
+                name: "Song A Updated",
+                genre: "Rock"
+            };
+            const updatedMusic = {...musicData1, ...dataPassed};
+            prismaMock.music.update.mockResolvedValue(updatedMusic);
+            const music = await musicService.update(10, dataPassed);
+            expect(music).toEqual(updatedMusic);
+            expect(prismaMock.music.update).toHaveBeenCalledWith({
+                data: dataPassed,
+                where: {
+                    id: 10
+                },
+            });
+        });
+
+        test("deve gerar erro ao passar um atributo inválido como parâmetro", async () => {
+            const dataPassed = {
+                name: "Song A Updated 2",
+                invalid: "invalid parameter"
+            };
+            prismaMock.music.update.mockRejectedValue(
+                new Error("Invalid field 'invalid' for update")
+            );
+
+            await expect(musicService.update(10, dataPassed))
+            .rejects
+            .toThrow("Unknown arg 'invalid'");
+
+            expect(prismaMock.music.update).toHaveBeenCalledWith({
+                data: dataPassed,
+                where: {
+                    id: 10
+                }
+            });
+        });
+
+        
+    });
+    
+
 
 });
 
