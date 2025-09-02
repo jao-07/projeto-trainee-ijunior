@@ -26,6 +26,21 @@ describe("musicService", () => {
         });
     });
 
+    describe("getMusics", () => {
+        test("deve retornar todas as músicas cadastradas", async () => {
+            prismaMock.music.findMany.mockResolvedValue([musicData1]);
+            const musics = await musicService.getMusics();
+            expect(musics).toEqual([musicData1]);
+            expect(prismaMock.music.findMany).toHaveBeenCalled();
+        });
+
+        test("deve retornar uma lista vazia quando não houver músicas cadastradas", async () => {
+            prismaMock.music.findMany.mockResolvedValue([]);
+            const musics = await musicService.getMusics();
+            expect(musics).toEqual([]);
+            expect(prismaMock.music.findMany).toHaveBeenCalled();
+        });
+    });
     
 });
 
