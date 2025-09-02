@@ -99,12 +99,32 @@ describe("musicService", () => {
                     id: 10
                 }
             });
-        });
-
-        
+        });  
     });
     
-
+    describe("deleteMusic", () => {
+        test("deve deletar a música do ID passado", async () => {
+            prismaMock.music.delete.mockResolvedValue(musicData1);
+            const music = await musicService.deleteMusic(10);
+            expect(music).toEqual(musicData1);
+            expect(prismaMock.music.delete).toHaveBeenCalledWith({
+                where: {id: 10}
+            });
+          });
+        
+        test("deve gerar erro ao tentar deletar música com ID que não existe", async () => {
+            prismaMock.music.delete.mockRejectedValue({
+                code: "P2025",
+                message: "ID não encontrado"
+            });
+            await expect(musicService.deleteMusic(999)).rejects.toMatchObject({
+                code: "P2025"
+            });
+            expect(prismaMock.music.delete).toHaveBeenCalledWith({
+                where: {id: 999}
+            });
+        });
+    });
 
 });
 
