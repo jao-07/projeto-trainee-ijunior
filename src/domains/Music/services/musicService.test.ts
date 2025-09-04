@@ -62,7 +62,7 @@ describe("musicService", () => {
         });
     });
 
-        describe("getMusicByName", () => {
+    describe("getMusicByName", () => {
         test("deve retornar a música do nome passado", async () => {
             prismaMock.music.findFirst.mockResolvedValue(musicData1);
             const music = await musicService.getMusicByName("Song A");
@@ -81,6 +81,28 @@ describe("musicService", () => {
             });
         });
     });
+
+    describe("getMusicsByArtist", () => {
+        test("deve retornar todas as músicas do artista do ID passado", async () => {
+            prismaMock.music.findMany.mockResolvedValue([musicData1]);
+            const musics = await musicService.getMusicsByArtist(1);
+            expect(musics).toEqual([musicData1]);
+            expect(prismaMock.music.findMany).toHaveBeenCalledWith({
+                where: { artists: { some: { id: 1 } } },
+                include: { artists: true }
+            });
+        });
+        test("deve retornar lista vazia quando o artista do ID passado não tiver músicas", async () => {
+            prismaMock.music.findMany.mockResolvedValue([]);
+            const musics = await musicService.getMusicsByArtist(999);
+            expect(musics).toEqual([]);
+            expect(prismaMock.music.findMany).toHaveBeenCalledWith({
+                where: { artists: { some: { id: 999 } } },
+                include: { artists: true }
+            });
+        }
+    });
+
 
     describe("update", () => {
         test("deve atualizar os dados da música do ID passado, com as informações passadas", async () => {
