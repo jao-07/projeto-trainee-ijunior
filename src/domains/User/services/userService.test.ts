@@ -157,6 +157,28 @@ describe("userService", () => {
 		});
 	});
 
+	describe("addMusicToUser", () => {
+		test("deve adicionar a música ao usuário e retornar os dados do usuário com as músicas", async () => {
+			const musicAdded = {
+				id: 1,
+				name: "music1",
+				genre: "genre1",
+				album: "album1",
+				artists: []
+			};
+			prismaMock.user.update.mockResolvedValue({ ...(userData1 as User), musics: [musicAdded] } as User & { musics: typeof musicAdded[] });
+			const user = await userService.addMusicToUser(1, 1);
+			expect(user).toEqual({...userData1, musics: [musicAdded]});
+			expect(prismaMock.user.update).toHaveBeenCalledWith({
+				data: {
+					musics: { connect: { id: 1 } }
+				},
+				where: { id: 1 },
+				include: { musics: true }
+			});
+		});
+	});
+
 	describe("deleteByID", () => {
 		test("deve deletar um usuário que está cadastrado", async () => {
 			prismaMock.user.delete.mockResolvedValue(userData2);
