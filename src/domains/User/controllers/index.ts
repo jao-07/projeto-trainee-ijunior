@@ -16,6 +16,26 @@ router.post("/create", async (req: Request, res: Response) => {
 		const data = req.body;
 		if(!data)
 			throw new InvalidParamError("Campos do usuário vazios");
+
+		data.privileges = userRoles.USER;
+		const user = await userService.create(data);
+		res.json(user).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Criar usuário (admin ou não)
+router.post("/create", async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Campos do usuário vazios");
+
 		const user = await userService.create(data);
 		res.json(user).status(statusCodes.SUCCESS);
 	}
@@ -155,26 +175,6 @@ router.put("/:id/music/:musicID", async (req: Request, res: Response, next: Next
 router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByID(Number(req.params.id));
-		res.json(user);
-	}
-	catch (error){
-		next(error);
-	}
-});
-
-router.get("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const user = await userService.getUserByEmail(req.params.email);
-		res.json(user);
-	}
-	catch (error) {
-		next(error);
-	}
-});
-
-router.delete("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const user = await userService.deleteByEmail(req.params.email);
 		res.json(user);
 	}
 	catch (error){

@@ -9,41 +9,7 @@ import { userRoles } from "../../../../utils/constants/userRoles";
 const router = Router();
 const musicService = new MusicService;
 
-router.get("/musics", verifyJWT, async (req: Request, res: Response) => {
-	try {
-		const musics = await musicService.getMusics();
-		res.status(statusCodes.SUCCESS).json(musics);
-	} catch (error: any) {
-		res.status(statusCodes.UNAUTHORIZED).json({
-			error: error.name,
-			message: error.message
-		});
-	}
-});
-
-//achar música por id
-router.get("/musics/:id", verifyJWT, async (req: Request, res: Response) => {
-	try {
-		const music = await musicService.getMusicById(Number(req.params.id));
-		res.status(statusCodes.SUCCESS).json(music);
-	} 
-	catch (error: any) {
-		res.status(statusCodes.UNAUTHORIZED).json({
-			error: error.name,
-			message:error.message
-		});
-	}
-});
-
-router.get("/music/:name", async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const music = await musicService.getMusicByName(req.params.name);
-		res.json(music);
-	} catch (error) {
-		next(error);
-	}
-});
-//listar musicas de um artista
+//Listar músicas de um artista (ordem alfabética)
 router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) => {
 	try{
 		const musics = await musicService.getMusicsByArtist(Number(req.params.id));
@@ -57,6 +23,32 @@ router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) =
 	}
 });
 
+//Listar todas as músicas (ordem alfabética)
+router.get("/musics", verifyJWT, async (req: Request, res: Response) => {
+	try {
+		const musics = await musicService.getMusics();
+		res.status(statusCodes.SUCCESS).json(musics);
+	} catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Visualizar música específica
+router.get("/musics/:id", verifyJWT, async (req: Request, res: Response) => {
+	try {
+		const music = await musicService.getMusicById(Number(req.params.id));
+		res.status(statusCodes.SUCCESS).json(music);
+	} 
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message:error.message
+		});
+	}
+});
 
 //criar música
 router.post("/musics/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
