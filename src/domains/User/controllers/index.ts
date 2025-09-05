@@ -117,6 +117,16 @@ router.get("/:id/musics", verifyJWT, async (req: Request, res: Response, next: N
 	}
 });
 
+router.delete("/:id/music/:musicID", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.removeMusicFromUser(Number(req.params.musicID), Number(req.params.id));
+		res.json(user);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const users = await userService.getUsers();
