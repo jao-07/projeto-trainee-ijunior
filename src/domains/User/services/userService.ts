@@ -26,7 +26,11 @@ export default class UserService {
 	}
 
 	async getUsers() {
-		return await prisma.user.findMany();
+		return await prisma.user.findMany({
+			orderBy: { 
+				name: "asc",
+			}
+		});
 	}
 
 	async getUserByID(userID: number){
