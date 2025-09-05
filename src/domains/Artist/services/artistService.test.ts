@@ -102,6 +102,65 @@ describe("artistService", () => {
 		});
 	});
 
+	describe("update", () => {
+		test("deve atualizar os dados de um artista", async () => {
+			const updatedArtistData = { ...artistData1, name: "Artista Atualizado" };
+			prismaMock.artist.update.mockResolvedValue(updatedArtistData);
+			const artist = await artistService.update(1, { name: "Artista Atualizado" });
+
+			expect(prismaMock.artist.update).toHaveBeenCalledWith({
+				data: { name: "Artista Atualizado" },
+				where: { id: 1 },
+			});
+			expect(artist).toEqual(updatedArtistData);
+		});
+
+		test("deve lançar um erro ao tentar atualizar um artista que não existe", async () => {
+			prismaMock.artist.update.mockRejectedValue({
+				code: "P2025",
+				message: "O artista não existe",
+			});
+			await expect(artistService.update(999, { name: "Nome" })).rejects.toMatchObject({
+				code: "P2025",
+			});
+		});
+	});
+
+	describe("addMusicToArtist", () => {
+		const musicID = 10;
+		const artistID = 1;
+		const artistWithMusics = {
+			...artistData1,
+			musics: [
+				{ id: musicID, name: "Música 1", duration: 200, artistId: artistID }
+			]
+		};
+
+		test("deve adicionar uma música ao artista e retornar o artista com as músicas", async () => {
+			prismaMock.artist.update.mockResolvedValue(artistWithMusics);
+
+			const result = await artistService.addMusicToArtist(musicID, artistID);
+
+			expect(prismaMock.artist.update).toHaveBeenCalledWith({
+				where: { id: artistID },
+				data: { musics: { connect: { id: musicID } } },
+				include: { musics: true }
+			});
+			expect(result).toEqual(artistWithMusics);
+		});
+
+		test("deve lançar um erro ao tentar adicionar uma música a um artista inexistente", async () => {
+			prismaMock.artist.update.mockRejectedValue({
+				code: "P2025",
+				message: "O artista não existe"
+			});
+
+			await expect(artistService.addMusicToArtist(musicID, 999)).rejects.toMatchObject({
+				code: "P2025"
+			});
+		});
+	});
+
 	describe("deleteArtist", () => {
 		test("deve deletar um artista de acordo com o ID", async () => {
 			prismaMock.artist.delete.mockResolvedValue(artistData1);
