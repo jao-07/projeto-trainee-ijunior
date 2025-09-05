@@ -30,7 +30,7 @@ router.post("/create", async (req: Request, res: Response) => {
 });
 
 //Criar usuário (admin ou não)
-router.post("/create", async (req: Request, res: Response) => {
+router.post("/admin/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try{
 		const data = req.body;
 		if(!data)
@@ -84,6 +84,24 @@ router.put("/account/update", verifyJWT, async (req: Request, res: Response) => 
 		};
 
 		const updatedUser = await userService.update(user.id as number, updateData);
+		res.json(updatedUser).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Editar usuário
+router.put("/account/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
+		const updatedUser = await userService.update(Number(req.params.id), data);
 		res.json(updatedUser).status(statusCodes.SUCCESS);
 	}
 	catch (error: any){
