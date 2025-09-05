@@ -107,7 +107,15 @@ router.delete("/account/delete", verifyJWT, async (req: Request, res: Response) 
 	}
 });
 
-
+router.get("/:id/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const musics = await userService.getMusics(Number(req.params.id));
+		res.json(musics);
+	}
+	catch (error) {
+		next(error);
+	}
+});
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
