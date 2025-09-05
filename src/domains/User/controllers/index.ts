@@ -107,6 +107,17 @@ router.delete("/account/delete", verifyJWT, async (req: Request, res: Response) 
 	}
 });
 
+router.post("/account/music/:musicID", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = req.user;
+		const addedMusic = await userService.addMusicToUser(Number(req.params.musicID), user.id as number);
+		res.status(statusCodes.SUCCESS).json(addedMusic);
+	}
+	catch (error){
+		next(error);
+	}
+});
+
 router.get("/:id/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const musics = await userService.getMusics(Number(req.params.id));
