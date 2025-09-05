@@ -41,6 +41,13 @@ export default class UserService {
 		return await prisma.user.findFirst({where: {email: userEmail}});
 	}
 
+	async getMusics(userID: number){
+		return await prisma.user.findUnique({
+			where: { id: userID },
+			include: { musics: true }
+		});
+	}
+
 	async update(userID: number, userData: Partial<User>){
 		if(userData.password)
 			userData.password = await encryptPassword(userData.password as string);
