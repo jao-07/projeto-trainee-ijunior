@@ -70,6 +70,16 @@ export default class UserService {
 		});
 	}
 
+	async removeMusicFromUser(musicID: number, userID: number){
+		return await prisma.user.update({
+			data: {
+				musics: { disconnect: { id: musicID } }
+			},
+			where: { id: userID },
+			include: { musics: true }
+		});
+	}
+
 	async deleteByID(userID: number){
 		return await prisma.user.delete({where:{id: userID}});
 	}
