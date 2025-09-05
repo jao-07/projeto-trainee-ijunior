@@ -16,6 +16,26 @@ router.post("/create", async (req: Request, res: Response) => {
 		const data = req.body;
 		if(!data)
 			throw new InvalidParamError("Campos do usuário vazios");
+
+		data.privileges = userRoles.USER;
+		const user = await userService.create(data);
+		res.json(user).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Criar usuário (admin ou não)
+router.post("/admin/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Campos do usuário vazios");
+
 		const user = await userService.create(data);
 		res.json(user).status(statusCodes.SUCCESS);
 	}
@@ -74,6 +94,24 @@ router.put("/account/update", verifyJWT, async (req: Request, res: Response) => 
 	}
 });
 
+//Editar usuário
+router.put("/account/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
+	try{
+		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
+		const updatedUser = await userService.update(Number(req.params.id), data);
+		res.json(updatedUser).status(statusCodes.SUCCESS);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
 //Alterar minha senha
 router.put("/account/password", verifyJWT, async (req: Request, res: Response) => {
 	try{
@@ -107,6 +145,20 @@ router.delete("/account/delete", verifyJWT, async (req: Request, res: Response) 
 	}
 });
 
+//Excluir usuário
+router.delete("/account/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
+	try{
+		const deletedUser = await userService.deleteByID(Number(req.params.id));
+		res.json(deletedUser).status(statusCodes.SUCCESS).clearCookie("jwt");
+	}
+	catch(error: any){
+		res.status(statusCodes.FORBIDDEN).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
 router.post("/account/music/:musicID", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = req.user;
@@ -117,6 +169,20 @@ router.post("/account/music/:musicID", verifyJWT, async (req: Request, res: Resp
 		next(error);
 	}
 });
+//Excluir usuário
+router.delete("/account/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
+	try{
+		const deletedUser = await userService.deleteByID(Number(req.params.id));
+		res.json(deletedUser).status(statusCodes.SUCCESS).clearCookie("jwt");
+	}
+	catch(error: any){
+		res.status(statusCodes.FORBIDDEN).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
 
 router.get("/:id/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
@@ -184,26 +250,6 @@ router.put("/:id/music/:musicID", async (req: Request, res: Response, next: Next
 router.delete("/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.deleteByID(Number(req.params.id));
-		res.json(user);
-	}
-	catch (error){
-		next(error);
-	}
-});
-
-router.get("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const user = await userService.getUserByEmail(req.params.email);
-		res.json(user);
-	}
-	catch (error) {
-		next(error);
-	}
-});
-
-router.delete("/email/:email", async (req: Request, res: Response, next: NextFunction) => {
-	try{
-		const user = await userService.deleteByEmail(req.params.email);
 		res.json(user);
 	}
 	catch (error){

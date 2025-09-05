@@ -2,7 +2,6 @@ import prisma from "../../../../config/prismaClient";
 import { User } from "@prisma/client";
 import { QueryError } from "../../../../errors/QueryError";
 import encryptPassword from "../../../../utils/functions/encryptPassword";
-import { userRoles } from "../../../../utils/constants/userRoles";
 
 export default class UserService {
 
@@ -20,7 +19,7 @@ export default class UserService {
 				email: userData.email,
 				photo: userData.photo,
 				password: userData.password,
-				privileges: userRoles.USER
+				privileges: userData.privileges
 			}
 		});
 	}
@@ -82,9 +81,5 @@ export default class UserService {
 
 	async deleteByID(userID: number){
 		return await prisma.user.delete({where:{id: userID}});
-	}
-
-	async deleteByEmail(userEmail: string){
-		return await prisma.user.delete({where:{email: userEmail}});
 	}
 }
