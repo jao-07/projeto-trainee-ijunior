@@ -1,0 +1,12 @@
+# .dockerignore
+
+# Ignorar dependências locais e logs
+node_modules
+npm-debug.log
+
+# Ignorar pasta de build local
+dist
+
+# Ignorar metadados do Git
+.git
+.gitignore

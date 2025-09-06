@@ -1,72 +1,99 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import MusicService from '../services/musicService';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Router, Request, Response, NextFunction } from "express";
+import MusicService from "../services/musicService";
+import {verifyJWT, checkRole} from "../../../middlewares/auth";
+import statusCodes from "../../../../utils/constants/statusCodes";
+import { InvalidParamError } from "../../../../errors/InvalidParamError";
+import { userRoles } from "../../../../utils/constants/userRoles";
 
 const router = Router();
 const musicService = new MusicService;
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+//Listar músicas de um artista (ordem alfabética)
+router.get("/musics/artist/:id", verifyJWT, async (req:Request, res: Response) => {
+	try{
+		const musics = await musicService.getMusicsByArtist(Number(req.params.id));
+		res.status(statusCodes.SUCCESS).json(musics);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
+	}
+});
+
+//Listar todas as músicas (ordem alfabética)
+router.get("/musics", verifyJWT, async (req: Request, res: Response) => {
 	try {
 		const musics = await musicService.getMusics();
-		res.json(musics);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(musics);
+	} catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Visualizar música específica
+router.get("/musics/:id", verifyJWT, async (req: Request, res: Response) => {
 	try {
 		const music = await musicService.getMusicById(Number(req.params.id));
-		res.json(music);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(music);
+	} 
+	catch (error: any) {
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message:error.message
+		});
 	}
 });
 
-router.get("/music/:name", async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const music = await musicService.getMusicByName(req.params.name);
-		res.json(music);
-	} catch (error) {
-		next(error);
-	}
-});
-
-router.get("/artist/:id", async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const musics = await musicService.getMusicsByArtist(Number(req.params.id));
-		res.json(musics);
-	} catch (error) {
-		next(error);
-	}
-});
-
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+//criar música
+router.post("/musics/create", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try {
 		const data = req.body;
+		if(!data)
+			throw new Error("Campos da música vazios");
 		const music = await musicService.create(data, data.artistIds);
-		res.json(music);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(music);
+	} catch (error:any) {
+		res.status(statusCodes.BAD_REQUEST).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Editar música
+router.put("/musics/update/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response) => {
 	try {
 		const data = req.body;
+		if(!data)
+			throw new InvalidParamError("Parâmetros de update vazios");
+
 		const music = await musicService.update(Number(req.params.id), data);
-		res.json(music);
-	} catch (error) {
-		next(error);
+		res.status(statusCodes.SUCCESS).json(music);
+	}
+	catch (error: any){
+		res.status(statusCodes.UNAUTHORIZED).json({
+			error: error.name,
+			message: error.message
+		});
 	}
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Deletar música
+router.delete("/musics/delete/:id", verifyJWT, checkRole(userRoles.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const music = await musicService.deleteMusic(Number(req.params.id));
 		res.json(music);
-	} catch (error) {
+	} catch (error){
 		next(error);
 	}
 });
+
+
 
 export default router;

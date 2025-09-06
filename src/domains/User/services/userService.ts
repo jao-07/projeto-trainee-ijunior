@@ -1,8 +1,18 @@
 import prisma from "../../../../config/prismaClient";
 import { User } from "@prisma/client";
+import { QueryError } from "../../../../errors/QueryError";
+import encryptPassword from "../../../../utils/functions/encryptPassword";
 
 export default class UserService {
+
 	async create(userData: User){
+
+		if(await prisma.user.findUnique({ where: { email: userData.email } })) {
+			throw new QueryError("Email já cadastrado.");
+		}
+
+		userData.password = await encryptPassword(userData.password);
+
 		return await prisma.user.create({
 			data: {
 				name: userData.name,
@@ -15,7 +25,11 @@ export default class UserService {
 	}
 
 	async getUsers() {
-		return await prisma.user.findMany();
+		return await prisma.user.findMany({
+			orderBy: { 
+				name: "asc",
+			}
+		});
 	}
 
 	async getUserByID(userID: number){
@@ -26,7 +40,17 @@ export default class UserService {
 		return await prisma.user.findFirst({where: {email: userEmail}});
 	}
 
+	async getMusics(userID: number){
+		return await prisma.user.findUnique({
+			where: { id: userID },
+			include: { musics: true }
+		});
+	}
+
 	async update(userID: number, userData: Partial<User>){
+		if(userData.password)
+			userData.password = await encryptPassword(userData.password as string);
+	
 		return await prisma.user.update({
 			data: userData,
 			where: {
@@ -45,11 +69,17 @@ export default class UserService {
 		});
 	}
 
-	async deleteByID(userID: number){
-		return await prisma.user.delete({where:{id: userID}});
+	async removeMusicFromUser(musicID: number, userID: number){
+		return await prisma.user.update({
+			data: {
+				musics: { disconnect: { id: musicID } }
+			},
+			where: { id: userID },
+			include: { musics: true }
+		});
 	}
 
-	async deleteByEmail(userEmail: string){
-		return await prisma.user.delete({where:{email: userEmail}});
+	async deleteByID(userID: number){
+		return await prisma.user.delete({where:{id: userID}});
 	}
 }

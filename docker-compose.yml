@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+
+  mysql-server:
+    container_name: ${NAME_CONTAINER_DB}
+    image: ${IMAGE_BD}
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${PORT_DB}:${PORT_DB}"
+    expose:
+      - ${PORT_DB}
+    networks:
+      - base_network
+    volumes:
+      - my_db:/var/lib/mysql
+  
+  backend-app: 
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    container_name: ${NAME_CONTAINER_API}
+    build:
+      context: .
+      dockerfile: api.dockerfile
+    image: ${NAME_IMAGE_API}
+    ports:
+      - "${PORT_API}:${PORT_API}"
+    networks:
+      - base_network
+    depends_on: 
+      - mysql-server
+
+networks:
+  base_network:
+    driver: bridge
+
+volumes:
+  my_db:
